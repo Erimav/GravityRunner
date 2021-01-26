@@ -124,6 +124,13 @@
 			"TypeName": "FlaxEngine.BoxBrush",
 			"ParentID": "71485f22423f938f9572b7b9779a44d5",
 			"Name": "Box Brush",
+			"Transform": {
+				"Scale": {
+					"X": 2.4766461849212648,
+					"Y": 1.0,
+					"Z": 2.573780059814453
+				}
+			},
 			"Size": {
 				"X": 300.0,
 				"Y": 10.0,
@@ -158,8 +165,8 @@
 			"Name": "Box Brush",
 			"Transform": {
 				"Translation": {
-					"X": 55.34956741333008,
-					"Y": 30.72269058227539,
+					"X": 96.4847412109375,
+					"Y": 28.696529388427736,
 					"Z": -75.96989440917969
 				}
 			},
@@ -190,31 +197,43 @@
 			]
 		},
 		{
-			"ID": "b0d72c3746caebca055e1f921ca21c7c",
-			"TypeName": "FlaxEngine.Camera",
-			"ParentID": "74a68a984824b4510d12589f199ad68f",
-			"Name": "Camera",
+			"ID": "6ef121254c35db69ceeae4b5aac74db3",
+			"TypeName": "FlaxEngine.BoxBrush",
+			"ParentID": "71485f22423f938f9572b7b9779a44d5",
+			"Name": "Box Brush 0",
 			"Transform": {
 				"Translation": {
-					"X": -107.51319122314453,
-					"Y": 87.28290557861328,
-					"Z": 131.2113494873047
-				},
-				"Orientation": {
-					"X": -0.04569302871823311,
-					"Y": -0.9367027282714844,
-					"Z": 0.1335863173007965,
-					"W": -0.3203979730606079
+					"X": 208.1097412109375,
+					"Y": 20.568401336669923,
+					"Z": -225.43309020996095
 				}
 			},
-			"StaticFlags": 0
-		},
-		{
-			"ID": "9053ad38428b10594c741db78d7fcca5",
-			"TypeName": "FreeCamera",
-			"ParentID": "b0d72c3746caebca055e1f921ca21c7c",
-			"V": {},
-			"Enabled": false
+			"Mode": 1,
+			"Size": {
+				"X": 60.0,
+				"Y": 50.0,
+				"Z": 60.0
+			},
+			"Surfaces": [
+				{
+					"Material": "8391b6da40053a988a0959ab9f26f700"
+				},
+				{
+					"Material": "8391b6da40053a988a0959ab9f26f700"
+				},
+				{
+					"Material": "8391b6da40053a988a0959ab9f26f700"
+				},
+				{
+					"ScaleInLightmap": 0.0
+				},
+				{
+					"Material": "8391b6da40053a988a0959ab9f26f700"
+				},
+				{
+					"Material": "8391b6da40053a988a0959ab9f26f700"
+				}
+			]
 		},
 		{
 			"ID": "a9ae06ec42882434ee61aab42a1c82c5",
@@ -278,7 +297,11 @@
 			"TypeName": "Game.PlayerScript",
 			"ParentID": "ae058c0f424c8c64dec7b08d53680a75",
 			"V": {
-	"ColorMaterial": "28cac01246c37a932ab9e0b92a838cc2"
+	"MouseSensivity": 7.0,
+	"ColorMaterial": "28cac01246c37a932ab9e0b92a838cc2",
+	"CameraActor": "b0d72c3746caebca055e1f921ca21c7c",
+	"Acceleration": 20.0,
+	"AirAcceleration": 10.0
 }
 		},
 		{
@@ -294,11 +317,13 @@
 					"W": 0.7071068286895752
 				}
 			},
+			"Layer": 1,
 			"Center": {
 				"X": 80.0,
 				"Y": 0.0,
 				"Z": 0.0
 			},
+			"Material": "9ec07a0d4ceed3072ef4499a5fba19f6",
 			"Radius": 40.0,
 			"Height": 80.0
 		},
@@ -314,6 +339,7 @@
 					"Z": 1.0
 				}
 			},
+			"Layer": 1,
 			"Model": "3f82e57744f57c28285150b646ad2198",
 			"Buffer": {
 				"Entries": [
@@ -325,6 +351,27 @@
 					}
 				]
 			}
+		},
+		{
+			"ID": "b0d72c3746caebca055e1f921ca21c7c",
+			"TypeName": "FlaxEngine.Camera",
+			"ParentID": "ae058c0f424c8c64dec7b08d53680a75",
+			"Name": "Camera",
+			"Transform": {
+				"Translation": {
+					"X": 0.0,
+					"Y": 137.00167846679688,
+					"Z": 0.0
+				}
+			},
+			"StaticFlags": 0
+		},
+		{
+			"ID": "9053ad38428b10594c741db78d7fcca5",
+			"TypeName": "FreeCamera",
+			"ParentID": "b0d72c3746caebca055e1f921ca21c7c",
+			"V": {},
+			"Enabled": false
 		}
 	]
 }
