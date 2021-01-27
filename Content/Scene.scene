@@ -126,9 +126,9 @@
 			"Name": "Box Brush",
 			"Transform": {
 				"Scale": {
-					"X": 2.4766461849212648,
+					"X": 11.980367660522461,
 					"Y": 1.0,
-					"Z": 2.573780059814453
+					"Z": 18.233278274536134
 				}
 			},
 			"Size": {
@@ -193,6 +193,106 @@
 				},
 				{
 					"Material": "8391b6da40053a988a0959ab9f26f700"
+				}
+			]
+		},
+		{
+			"ID": "fd15fefe468a8e87cd945e9f1f112c97",
+			"TypeName": "FlaxEngine.BoxBrush",
+			"ParentID": "71485f22423f938f9572b7b9779a44d5",
+			"Name": "Box Brush 1",
+			"Transform": {
+				"Translation": {
+					"X": 0.0,
+					"Y": 0.0,
+					"Z": -1667.3133544921876
+				},
+				"Orientation": {
+					"X": -0.710731565952301,
+					"Y": 0.0,
+					"Z": 0.0,
+					"W": 0.7034633755683899
+				},
+				"Scale": {
+					"X": 2.4766461849212648,
+					"Y": 1.0,
+					"Z": 2.573780059814453
+				}
+			},
+			"Size": {
+				"X": 300.0,
+				"Y": 10.0,
+				"Z": 300.0
+			},
+			"Surfaces": [
+				{
+					"Material": "382f1ae946c519eff6e6f3a2965cf56b"
+				},
+				{
+					"Material": "382f1ae946c519eff6e6f3a2965cf56b"
+				},
+				{
+					"Material": "382f1ae946c519eff6e6f3a2965cf56b"
+				},
+				{
+					"Material": "382f1ae946c519eff6e6f3a2965cf56b",
+					"ScaleInLightmap": 0.0
+				},
+				{
+					"Material": "382f1ae946c519eff6e6f3a2965cf56b"
+				},
+				{
+					"Material": "382f1ae946c519eff6e6f3a2965cf56b"
+				}
+			]
+		},
+		{
+			"ID": "b81a16f240ed55453da627b629e7d7c7",
+			"TypeName": "FlaxEngine.BoxBrush",
+			"ParentID": "71485f22423f938f9572b7b9779a44d5",
+			"Name": "Box Brush 0",
+			"Transform": {
+				"Translation": {
+					"X": 0.0,
+					"Y": 0.0,
+					"Z": 858.0830688476563
+				},
+				"Orientation": {
+					"X": -0.7071068286895752,
+					"Y": 0.0,
+					"Z": 0.0,
+					"W": 0.7071067690849304
+				},
+				"Scale": {
+					"X": 2.4766461849212648,
+					"Y": 1.0,
+					"Z": 2.573780059814453
+				}
+			},
+			"Size": {
+				"X": 300.0,
+				"Y": 10.0,
+				"Z": 300.0
+			},
+			"Surfaces": [
+				{
+					"Material": "382f1ae946c519eff6e6f3a2965cf56b"
+				},
+				{
+					"Material": "382f1ae946c519eff6e6f3a2965cf56b"
+				},
+				{
+					"Material": "382f1ae946c519eff6e6f3a2965cf56b"
+				},
+				{
+					"Material": "382f1ae946c519eff6e6f3a2965cf56b",
+					"ScaleInLightmap": 0.0
+				},
+				{
+					"Material": "382f1ae946c519eff6e6f3a2965cf56b"
+				},
+				{
+					"Material": "382f1ae946c519eff6e6f3a2965cf56b"
 				}
 			]
 		},
@@ -289,6 +389,13 @@
 			"TypeName": "FlaxEngine.RigidBody",
 			"ParentID": "74a68a984824b4510d12589f199ad68f",
 			"Name": "RigidBody",
+			"Transform": {
+				"Translation": {
+					"X": 0.0,
+					"Y": 199.5628204345703,
+					"Z": 0.0
+				}
+			},
 			"Mass": 23423.751953125,
 			"Constraints": 56
 		},
@@ -298,11 +405,36 @@
 			"ParentID": "ae058c0f424c8c64dec7b08d53680a75",
 			"V": {
 	"MouseSensivity": 7.0,
+	"AirControl": 0.8,
+	"Acceleration": 20.0,
+	"AirAcceleration": 15.0,
+	"JumpForce": 500.0,
+	"MaxAirJumps": 1,
 	"ColorMaterial": "28cac01246c37a932ab9e0b92a838cc2",
 	"CameraActor": "b0d72c3746caebca055e1f921ca21c7c",
-	"Acceleration": 20.0,
-	"AirAcceleration": 10.0
+	"GravityActor": "52f2de4e4235d927f37f47825c8271f9"
 }
+		},
+		{
+			"ID": "b0d72c3746caebca055e1f921ca21c7c",
+			"TypeName": "FlaxEngine.Camera",
+			"ParentID": "ae058c0f424c8c64dec7b08d53680a75",
+			"Name": "Camera",
+			"Transform": {
+				"Translation": {
+					"X": 0.0,
+					"Y": 137.00167846679688,
+					"Z": 0.0
+				}
+			},
+			"StaticFlags": 0
+		},
+		{
+			"ID": "9053ad38428b10594c741db78d7fcca5",
+			"TypeName": "FreeCamera",
+			"ParentID": "b0d72c3746caebca055e1f921ca21c7c",
+			"V": {},
+			"Enabled": false
 		},
 		{
 			"ID": "7e91ac0c47149f5f022f168fabf995ec",
@@ -353,25 +485,10 @@
 			}
 		},
 		{
-			"ID": "b0d72c3746caebca055e1f921ca21c7c",
-			"TypeName": "FlaxEngine.Camera",
-			"ParentID": "ae058c0f424c8c64dec7b08d53680a75",
-			"Name": "Camera",
-			"Transform": {
-				"Translation": {
-					"X": 0.0,
-					"Y": 137.00167846679688,
-					"Z": 0.0
-				}
-			},
-			"StaticFlags": 0
-		},
-		{
-			"ID": "9053ad38428b10594c741db78d7fcca5",
-			"TypeName": "FreeCamera",
-			"ParentID": "b0d72c3746caebca055e1f921ca21c7c",
-			"V": {},
-			"Enabled": false
+			"ID": "52f2de4e4235d927f37f47825c8271f9",
+			"TypeName": "FlaxEngine.EmptyActor",
+			"ParentID": "74a68a984824b4510d12589f199ad68f",
+			"Name": "GravityActor"
 		}
 	]
 }
