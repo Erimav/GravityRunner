@@ -16,7 +16,6 @@ namespace Game
         public float GravityRotationScale = 1;
         public Material ColorMaterial;
         public Actor CameraActor;
-        public Actor GravityActor;
         public Vector2 LocalRotationAngles;
 
         private int airJumps;
@@ -108,10 +107,10 @@ namespace Game
             //Rotating
             LocalRotationAngles += rotateInput * MouseSensivity * Time.DeltaTime;
             LocalRotationAngles.X = Mathf.Clamp(LocalRotationAngles.X, -90, 90);
-            var angleRad = -LocalRotationAngles.Y * Mathf.DegreesToRadians;
-            var localDirection = new Vector3(Mathf.Cos(angleRad), 0f, Mathf.Sin(angleRad));
-            var direction = GravityActor.Transform.TransformDirection(localDirection);
-            var orientation = Quaternion.LookRotation(direction, -Physics.Gravity);
+            float angleRad = rotateInput.Y * Time.DeltaTime * MouseSensivity * Mathf.DegreesToRadians;
+            var direction = Vector3.Cross(Physics.Gravity, Actor.Transform.Right);//GravityActor.Transform.TransformDirection(localDirection);
+            var gravityRotationDelta = Quaternion.RotationAxis(-Physics.Gravity, angleRad);
+            var orientation = Quaternion.LookRotation(direction * gravityRotationDelta, -Physics.Gravity);
             Actor.Orientation = orientation;
             CameraActor.LocalOrientation = Quaternion.Euler(LocalRotationAngles.X, 0, 0);
 
@@ -119,8 +118,8 @@ namespace Game
 
             var deltaRotation = Quaternion.RotationAxis(Actor.Transform.Forward, -gravityClockwiseAngleDelta * GravityRotationScale * Time.DeltaTime) //Clockwise
                               * Quaternion.RotationAxis(Actor.Transform.Right, -gravityVerticalAngleDelta * GravityRotationScale * Time.DeltaTime); //Vertical
-            GravityActor.Orientation *= deltaRotation;
-            Physics.Gravity = GravityActor.Transform.Down * 981f;
+            Physics.Gravity *= deltaRotation;
+            //Physics.Gravity = GravityActor.Transform.Down * 981f;
         }
 
         public void Jump()
