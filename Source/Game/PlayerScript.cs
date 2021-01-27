@@ -8,19 +8,24 @@ namespace Game
     {
         public float Speed = 500;
         public float MouseSensivity = 1;
-        public Material ColorMaterial;
-        public Actor CameraActor;
         public float AirControl = .3f;
         public float Acceleration;
         public float AirAcceleration;
         public float JumpForce = 1000;
-        //public bool IsGrounded = true;
+        public int MaxAirJumps = 0;
+        public float GravityRotationScale = 1;
+        public Material ColorMaterial;
+        public Actor CameraActor;
+        public Actor GravityActor;
+        public Vector2 LocalRotationAngles;
 
-        private float currentSpeed;
-        private Vector3 movement;
+        private int airJumps;
+        private Vector3 movementInput;
         private Vector3 velocity;
-        private Vector2 rotate;
-        private Vector2 localRotationAngles;
+        private Vector2 rotateInput;
+        private float gravityClockwiseAngleDelta;
+        private float gravityVerticalAngleDelta;
+
         private CapsuleCollider collider;
         private RigidBody rigidBody;
         private MaterialInstance blueMat;
@@ -37,7 +42,7 @@ namespace Game
             }
         }
 
-        public bool CanJump => IsGrounded;
+        public bool CanJump => IsGrounded || airJumps > 0;
 
         public override void OnAwake()
         {
@@ -57,18 +62,23 @@ namespace Game
         public override void OnUpdate()
         {
             GetInputs();
-            
+
             //debug
             Actor.GetChild<StaticModel>().SetMaterial(0, IsGrounded ? blueMat : redMat);
         }
 
         private void GetInputs()
         {
-            movement.X = Input.GetAxis("Horizontal");
-            movement.Z = Input.GetAxis("Vertical");
-            movement.Normalize();
-            rotate.X = Input.GetAxis("Mouse Y");
-            rotate.Y = Input.GetAxis("Mouse X");
+            movementInput.X = Input.GetAxis("Horizontal");
+            movementInput.Z = Input.GetAxis("Vertical");
+            movementInput.Normalize();
+            rotateInput.X = Input.GetAxis("Mouse Y");
+            rotateInput.Y = Input.GetAxis("Mouse X");
+            gravityClockwiseAngleDelta
+                = Convert.ToSingle(Input.GetAction("Gravity clockwise"))
+                - Convert.ToSingle(Input.GetAction("Gravity counterclockwise"));
+            gravityVerticalAngleDelta = Input.GetAxis("Gravity vertical");
+
             if (Input.GetAction("Jump"))
                 Jump();
 
@@ -82,11 +92,12 @@ namespace Game
         public override void OnFixedUpdate()
         {
             //Moving
-            var transformedMovement = Actor.Transform.TransformDirection(movement);
+            var transformedMovement = Actor.Transform.TransformDirection(movementInput);
             if (IsGrounded)
             {
                 velocity = Vector3.Lerp(velocity, transformedMovement * Speed, Acceleration * Time.DeltaTime);
                 Actor.Position += velocity * Time.DeltaTime;
+                airJumps = MaxAirJumps;
             }
             else
             {
@@ -95,11 +106,21 @@ namespace Game
             }
 
             //Rotating
-            localRotationAngles += rotate * MouseSensivity * Time.DeltaTime;
-            localRotationAngles.X = Mathf.Clamp(localRotationAngles.X, -90, 90);
-            Vector3 gravity = Physics.Gravity;
-            Actor.Orientation = Quaternion.RotationAxis(-gravity, localRotationAngles.Y * Mathf.DegreesToRadians);
-            CameraActor.LocalOrientation = Quaternion.Euler(localRotationAngles.X, 0, 0);
+            LocalRotationAngles += rotateInput * MouseSensivity * Time.DeltaTime;
+            LocalRotationAngles.X = Mathf.Clamp(LocalRotationAngles.X, -90, 90);
+            var angleRad = -LocalRotationAngles.Y * Mathf.DegreesToRadians;
+            var localDirection = new Vector3(Mathf.Cos(angleRad), 0f, Mathf.Sin(angleRad));
+            var direction = GravityActor.Transform.TransformDirection(localDirection);
+            var orientation = Quaternion.LookRotation(direction, -Physics.Gravity);
+            Actor.Orientation = orientation;
+            CameraActor.LocalOrientation = Quaternion.Euler(LocalRotationAngles.X, 0, 0);
+
+            //Rotating gravity
+
+            var deltaRotation = Quaternion.RotationAxis(Actor.Transform.Forward, -gravityClockwiseAngleDelta * GravityRotationScale * Time.DeltaTime) //Clockwise
+                              * Quaternion.RotationAxis(Actor.Transform.Right, -gravityVerticalAngleDelta * GravityRotationScale * Time.DeltaTime); //Vertical
+            GravityActor.Orientation *= deltaRotation;
+            Physics.Gravity = GravityActor.Transform.Down * 981f;
         }
 
         public void Jump()
@@ -107,8 +128,15 @@ namespace Game
             if (!CanJump)
                 return;
 
-            var jumpVector = Transform.Up;
-            rigidBody.AddForce(jumpVector * JumpForce + velocity, ForceMode.VelocityChange);
+            var jumpVector = Actor.Transform.Up;
+
+            if (IsGrounded)
+                rigidBody.AddForce(jumpVector * JumpForce + velocity, ForceMode.VelocityChange);
+            else
+            {
+                rigidBody.LinearVelocity = jumpVector * JumpForce + velocity;
+                airJumps--;
+            }
         }
 
         //public override void OnDebugDraw()
