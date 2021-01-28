@@ -153,6 +153,18 @@ namespace Game
             }
         }
 
+        public void Reset()
+        {
+            currentRotationAngles = TargetRotationAngles;
+            TargetRotationAngles.X = 0;
+            velocity = default;
+            rigidBody.LinearVelocity = default;
+            gravityClockwiseChangeVelocity = 0;
+            gravityVerticalChangeVelocity = 0;
+            gravityClockwiseAngleDelta = 0f;
+            gravityVerticalAngleDelta = 0f;
+        }
+
         //public override void OnDebugDraw()
         //{
         //    base.OnDebugDraw();
