@@ -8,13 +8,14 @@ namespace Game
     {
         public float Speed = 500;
         public float MouseSensivity = 1;
-        public float MouseSmoothness = 1f;
+        public float MouseSmoothness = 10;
         public float AirControl = .8f;
         public float Acceleration;
         public float AirAcceleration;
         public float JumpForce = 500;
         public int MaxAirJumps = 0;
         public float GravityRotationScale = 1;
+        public float GravityRotationSmoothTime = 1;
         public Material ColorMaterial;
         public Actor CameraActor;
         public Vector2 TargetRotationAngles;
@@ -26,6 +27,8 @@ namespace Game
         private Vector2 currentRotationAngles;
         private float gravityClockwiseAngleDelta;
         private float gravityVerticalAngleDelta;
+        private float gravityClockwiseChangeVelocity;
+        private float gravityVerticalChangeVelocity;
 
         private CapsuleCollider collider;
         private RigidBody rigidBody;
@@ -76,10 +79,16 @@ namespace Game
             movementInput.Normalize();
             rotateInput.X = Input.GetAxis("Mouse Y");
             rotateInput.Y = Input.GetAxis("Mouse X");
-            gravityClockwiseAngleDelta
-                = Convert.ToSingle(Input.GetAction("Gravity clockwise"))
-                - Convert.ToSingle(Input.GetAction("Gravity counterclockwise"));
-            gravityVerticalAngleDelta = Input.GetAxis("Gravity vertical");
+            gravityClockwiseAngleDelta = Mathf.SmoothDamp(gravityClockwiseAngleDelta,
+                  Convert.ToSingle(Input.GetAction("Gravity clockwise"))
+                - Convert.ToSingle(Input.GetAction("Gravity counterclockwise")),
+                  ref gravityClockwiseChangeVelocity, 
+                  GravityRotationSmoothTime);
+            gravityVerticalAngleDelta = Mathf.SmoothDamp(
+                gravityVerticalAngleDelta, 
+                Input.GetAxis("Gravity vertical"),
+                ref gravityVerticalChangeVelocity,
+                GravityRotationSmoothTime);
 
             if (Input.GetAction("Jump"))
                 Jump();

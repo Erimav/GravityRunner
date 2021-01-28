@@ -505,11 +505,10 @@
 			"ParentID": "ae058c0f424c8c64dec7b08d53680a75",
 			"V": {
 	"MouseSensivity": 7.0,
-	"AirControl": 0.8,
 	"Acceleration": 20.0,
 	"AirAcceleration": 15.0,
-	"JumpForce": 500.0,
 	"MaxAirJumps": 1,
+	"GravityRotationSmoothTime": 0.1,
 	"ColorMaterial": "28cac01246c37a932ab9e0b92a838cc2",
 	"CameraActor": "b0d72c3746caebca055e1f921ca21c7c"
 }
@@ -598,7 +597,7 @@
 			},
 			"V": {
 	"Size": {
-		"X": 1273.0,
+		"X": 1308.0,
 		"Y": 768.0
 	}
 }
@@ -787,7 +786,7 @@
 			"Name": "Right bar",
 			"Transform": {
 				"Translation": {
-					"X": 1233.0,
+					"X": 1268.0,
 					"Y": 45.0,
 					"Z": 0.0
 				}
