@@ -21,7 +21,7 @@ namespace Game
         {
             var top = 0f;
             var bottom = bar.Control.Bottom - bar.Control.Top;
-            var angle = player.LocalRotationAngles.X + 90f;
+            var angle = player.TargetRotationAngles.X + 90f;
             control.Y = Mathf.Lerp(bottom, top, 1 - (angle / 180f));
         }
     }

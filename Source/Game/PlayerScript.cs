@@ -8,20 +8,22 @@ namespace Game
     {
         public float Speed = 500;
         public float MouseSensivity = 1;
-        public float AirControl = .3f;
+        public float MouseSmoothness = 1f;
+        public float AirControl = .8f;
         public float Acceleration;
         public float AirAcceleration;
-        public float JumpForce = 1000;
+        public float JumpForce = 500;
         public int MaxAirJumps = 0;
         public float GravityRotationScale = 1;
         public Material ColorMaterial;
         public Actor CameraActor;
-        public Vector2 LocalRotationAngles;
+        public Vector2 TargetRotationAngles;
 
         private int airJumps;
         private Vector3 movementInput;
         private Vector3 velocity;
         private Vector2 rotateInput;
+        private Vector2 currentRotationAngles;
         private float gravityClockwiseAngleDelta;
         private float gravityVerticalAngleDelta;
 
@@ -53,6 +55,7 @@ namespace Game
             blueMat.SetParameterValue("Color", Color.Blue);
             redMat = ColorMaterial.CreateVirtualInstance();
             redMat.SetParameterValue("Color", Color.Red);
+            currentRotationAngles = TargetRotationAngles;
 
             Screen.CursorVisible = false;
             Screen.CursorLock = CursorLockMode.Locked;
@@ -105,17 +108,20 @@ namespace Game
             }
 
             //Rotating
-            LocalRotationAngles += rotateInput * MouseSensivity * Time.DeltaTime;
-            LocalRotationAngles.X = Mathf.Clamp(LocalRotationAngles.X, -90, 90);
-            float angleRad = rotateInput.Y * Time.DeltaTime * MouseSensivity * Mathf.DegreesToRadians;
+            TargetRotationAngles += rotateInput * MouseSensivity * Time.DeltaTime;
+            TargetRotationAngles.X = Mathf.Clamp(TargetRotationAngles.X, -90, 90);
+            var newRotationAngles = Vector2.Lerp(currentRotationAngles, TargetRotationAngles, MouseSmoothness * Time.DeltaTime);
+            var deltaRotationAngles = newRotationAngles - currentRotationAngles;
+            float angleRad = deltaRotationAngles.Y * Mathf.DegreesToRadians;
             var direction = Vector3.Cross(Physics.Gravity, Actor.Transform.Right);//GravityActor.Transform.TransformDirection(localDirection);
             var gravityRotationDelta = Quaternion.RotationAxis(-Physics.Gravity, angleRad);
             var orientation = Quaternion.LookRotation(direction * gravityRotationDelta, -Physics.Gravity);
+
+            currentRotationAngles = newRotationAngles;
             Actor.Orientation = orientation;
-            CameraActor.LocalOrientation = Quaternion.Euler(LocalRotationAngles.X, 0, 0);
+            CameraActor.LocalOrientation = Quaternion.Euler(newRotationAngles.X, 0, 0);
 
             //Rotating gravity
-
             var deltaRotation = Quaternion.RotationAxis(Actor.Transform.Forward, -gravityClockwiseAngleDelta * GravityRotationScale * Time.DeltaTime) //Clockwise
                               * Quaternion.RotationAxis(Actor.Transform.Right, -gravityVerticalAngleDelta * GravityRotationScale * Time.DeltaTime); //Vertical
             Physics.Gravity *= deltaRotation;
