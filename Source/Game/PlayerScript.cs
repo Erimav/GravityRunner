@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using FlaxEngine;
 
 namespace Game
@@ -29,6 +30,7 @@ namespace Game
         private float gravityVerticalAngleDelta;
         private float gravityClockwiseChangeVelocity;
         private float gravityVerticalChangeVelocity;
+        private uint playerLayerMask = ~(1U << 1);
 
         private CapsuleCollider collider;
         private RigidBody rigidBody;
@@ -41,8 +43,7 @@ namespace Game
             {
                 Vector3 down = Transform.Down;
                 var center = Actor.Position - down * collider.Radius;
-                var layerMask = ~(1U << 1);
-                return Physics.SphereCast(center, collider.Radius * 0.95f, down, maxDistance: collider.Radius / 2, layerMask);
+                return Physics.SphereCast(center, collider.Radius * 0.9f, down, maxDistance: collider.Radius / 2, playerLayerMask, hitTriggers: false);
             }
         }
 
@@ -82,16 +83,19 @@ namespace Game
             gravityClockwiseAngleDelta = Mathf.SmoothDamp(gravityClockwiseAngleDelta,
                   Convert.ToSingle(Input.GetAction("Gravity clockwise"))
                 - Convert.ToSingle(Input.GetAction("Gravity counterclockwise")),
-                  ref gravityClockwiseChangeVelocity, 
+                  ref gravityClockwiseChangeVelocity,
                   GravityRotationSmoothTime);
             gravityVerticalAngleDelta = Mathf.SmoothDamp(
-                gravityVerticalAngleDelta, 
+                gravityVerticalAngleDelta,
                 Input.GetAxis("Gravity vertical"),
                 ref gravityVerticalChangeVelocity,
                 GravityRotationSmoothTime);
 
             if (Input.GetAction("Jump"))
                 Jump();
+
+            if (Input.GetAction("Reset gravity"))
+                SetGravityToGroundNormal();
 
             if (Input.GetKeyDown(KeyboardKeys.C))
             {
@@ -142,15 +146,73 @@ namespace Game
             if (!CanJump)
                 return;
 
-            var jumpVector = Actor.Transform.Up;
-
+            Vector3 jumpVector;
             if (IsGrounded)
-                rigidBody.AddForce(jumpVector * JumpForce + velocity, ForceMode.VelocityChange);
-            else
             {
-                rigidBody.LinearVelocity = jumpVector * JumpForce + velocity;
-                airJumps--;
+                var normal = GetGoundNormal();
+                jumpVector = normal != Vector3.Zero
+                    ? normal
+                    : Actor.Transform.Up;
             }
+            else
+                jumpVector = Actor.Transform.Up;
+
+            rigidBody.LinearVelocity = GetJumpVelocity(jumpVector);
+
+            if (!IsGrounded)
+                airJumps--;
+        }
+
+        public Vector3 GetJumpVelocity(Vector3 jumpVector) => GetJumpVelocity(jumpVector, this.velocity);
+        public Vector3 GetJumpVelocity(Vector3 jumpVector, Vector3 velocity) => jumpVector * JumpForce + velocity;
+
+        public void SetGravityToGroundNormal()
+        {
+            var normal = GetGoundNormal();
+            if (normal == Vector3.Zero)
+                return;
+
+            var gravity = -normal * Global.g;
+
+            Task.Run(() => SmoothGravity(gravity));
+            Debug.Log($"Gravity's been set to {gravity}");
+        }
+
+        public async Task SmoothGravity(Vector3 gravity)
+        {
+            var t = 0f;
+            var startGravity = Physics.Gravity;
+
+            //pompensating camera angle
+            var right = Actor.Transform.Right;
+            var sgProj = Vector3.ProjectOnPlane(startGravity, right);
+            var gProj = Vector3.ProjectOnPlane(gravity, right);
+            //var angle = Vector3.Angle(sgProj, gProj);
+            var angle = Vector3.Angle(startGravity, gravity);
+            Debug.Log($"{startGravity} | {gravity}");
+            Debug.Log($"angle: {angle}");
+            var startPitch = TargetRotationAngles.X;
+            var endPitch = startPitch + angle;
+
+            do
+            {
+                await Scripting.RunOnUpdate(() =>
+                {
+                    t += Time.DeltaTime;
+                    var bufferGravity = Physics.Gravity;
+                    Physics.Gravity = Vector3.SmoothStep(startGravity, gravity, t / GravityRotationSmoothTime);
+                    TargetRotationAngles.X = Mathf.SmoothStep(startPitch, endPitch, t / GravityRotationSmoothTime);
+                    
+                });
+            } while (t < GravityRotationSmoothTime);
+        }
+
+        private Vector3 GetGoundNormal()
+        {
+            if (!Physics.RayCast(Actor.Position, Actor.Transform.Down, out var hit, 100f, layerMask: playerLayerMask, hitTriggers: false))
+                return Vector3.Zero;
+            
+            return hit.Normal;
         }
 
         public void Reset()
