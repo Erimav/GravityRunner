@@ -183,16 +183,7 @@ namespace Game
             var t = 0f;
             var startGravity = Physics.Gravity;
 
-            //pompensating camera angle
-            var right = Actor.Transform.Right;
-            var sgProj = Vector3.ProjectOnPlane(startGravity, right);
-            var gProj = Vector3.ProjectOnPlane(gravity, right);
-            //var angle = Vector3.Angle(sgProj, gProj);
-            var angle = Vector3.Angle(startGravity, gravity);
-            Debug.Log($"{startGravity} | {gravity}");
-            Debug.Log($"angle: {angle}");
-            var startPitch = TargetRotationAngles.X;
-            var endPitch = startPitch + angle;
+            var direction = -Math.Sign(TargetRotationAngles.X);//Cam compensating direction
 
             do
             {
@@ -201,8 +192,14 @@ namespace Game
                     t += Time.DeltaTime;
                     var bufferGravity = Physics.Gravity;
                     Physics.Gravity = Vector3.SmoothStep(startGravity, gravity, t / GravityRotationSmoothTime);
-                    TargetRotationAngles.X = Mathf.SmoothStep(startPitch, endPitch, t / GravityRotationSmoothTime);
-                    
+
+                    //pompensating camera angle
+                    var right = Actor.Transform.Right;
+                    var bgProj = Vector3.ProjectOnPlane(bufferGravity, right);
+                    var gProj = Vector3.ProjectOnPlane(Physics.Gravity, right);
+                    var angle = Vector3.Angle(bgProj, gProj) * Mathf.Pow(Mathf.RadiansToDegrees, 2) * direction;
+                    TargetRotationAngles.X += angle;
+                    currentRotationAngles.X += angle;
                 });
             } while (t < GravityRotationSmoothTime);
         }
@@ -211,7 +208,7 @@ namespace Game
         {
             if (!Physics.RayCast(Actor.Position, Actor.Transform.Down, out var hit, 100f, layerMask: playerLayerMask, hitTriggers: false))
                 return Vector3.Zero;
-            
+
             return hit.Normal;
         }
 

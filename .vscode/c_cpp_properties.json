@@ -1,0 +1,12 @@
+{
+	"configurations": [
+		{
+			"name": "Game",
+			"includePath": [
+			],
+			"intelliSenseMode": "msvc-x64",
+			"defines": [
+			]
+		}
+	]
+}

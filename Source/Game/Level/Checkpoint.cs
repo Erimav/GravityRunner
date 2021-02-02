@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using FlaxEngine;
 
 namespace Game
@@ -14,6 +15,8 @@ namespace Game
         public Actor DefaultPose;
         public Vector3 DefaultGravity = new Vector3(0, -981, 0);
         public Collider Trigger;
+
+        private bool isLoading = false;
 
         public override void OnStart()
         {
@@ -38,10 +41,25 @@ namespace Game
 
         public void Load()
         {
-            var player = Scene.FindActor("Player");
+            if (!isLoading)
+                _ = LoadAsync();
+        }
+
+        public async Task LoadAsync()
+        {
+            isLoading = true;
+            await BlackScreen.Appear();
+            ResetPlayer();
+            await BlackScreen.Faint();
+            isLoading = false;
+        }
+
+        private void ResetPlayer()
+        {
+            Actor player = Scene.FindActor("Player");
             player.Transform = DefaultPose.Transform;
             Physics.Gravity = DefaultGravity;
             player.GetScript<PlayerScript>().Reset();
-        } 
+        }
     }
 }
